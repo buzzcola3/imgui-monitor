@@ -1,3 +1,8 @@
+config_setting(
+    name = "linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
 cc_binary(
     name = "hello",
     srcs = ["hello.cpp"],
@@ -7,6 +12,11 @@ cc_binary(
     name = "window",
     srcs = ["window.cpp"],
     deps = [
+        "//third_party:glad",
         "//third_party:glfw",
     ],
+    linkopts = select({
+        ":linux": ["/usr/lib/x86_64-linux-gnu/libGL.so.1"],
+        "//conditions:default": [],
+    }),
 )

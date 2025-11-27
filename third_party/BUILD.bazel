@@ -3,3 +3,9 @@ alias(
     actual = "//third_party/glfw:glfw",
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "glad",
+    actual = "//third_party/glad:glad",
+    visibility = ["//visibility:public"],
+)

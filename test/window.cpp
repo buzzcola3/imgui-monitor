@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <chrono>
@@ -36,8 +37,19 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+        std::cerr << "Failed to load OpenGL functions via GLAD" << std::endl;
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 1;
+    }
+
+    glViewport(0, 0, kWidth, kHeight);
+    glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
+
     const auto deadline = std::chrono::steady_clock::now() + kRunTime;
     while (!glfwWindowShouldClose(window) && std::chrono::steady_clock::now() < deadline) {
+        glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
         glfwPollEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(kMsPerFrame));

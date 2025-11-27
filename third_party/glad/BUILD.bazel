@@ -1,0 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "glad",
+    srcs = ["src/glad.c"],
+    hdrs = glob([
+        "include/KHR/*.h",
+        "include/glad/*.h",
+    ]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    linkstatic = True,
+)
