@@ -1,4 +1,4 @@
-#include "monitor/imgui_monitor.h"
+#include "debugglass/debugglass.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -16,22 +16,22 @@ namespace {
 constexpr char kGlslVersion[] = "#version 330";
 }
 
-ImGuiMonitor::~ImGuiMonitor() {
+DebugGlass::~DebugGlass() {
     Stop();
 }
 
-bool ImGuiMonitor::Run(const MonitorOptions& options) {
+bool DebugGlass::Run(const DebugGlassOptions& options) {
     if (running_.exchange(true)) {
         return false;
     }
 
     stop_requested_.store(false);
 
-    worker_ = std::thread(&ImGuiMonitor::ThreadMain, this, options);
+    worker_ = std::thread(&DebugGlass::ThreadMain, this, options);
     return true;
 }
 
-void ImGuiMonitor::Stop() {
+void DebugGlass::Stop() {
     stop_requested_.store(true);
     if (worker_.joinable()) {
         worker_.join();
@@ -40,11 +40,11 @@ void ImGuiMonitor::Stop() {
     running_.store(false);
 }
 
-bool ImGuiMonitor::IsRunning() const {
+bool DebugGlass::IsRunning() const {
     return running_.load();
 }
 
-void ImGuiMonitor::ThreadMain(MonitorOptions options) {
+void DebugGlass::ThreadMain(DebugGlassOptions options) {
     GLFWwindow* window = nullptr;
     bool glfw_initialized = false;
     bool imgui_created = false;
@@ -121,8 +121,8 @@ void ImGuiMonitor::ThreadMain(MonitorOptions options) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("ImGui Monitor");
-        ImGui::TextUnformatted("ImGui monitor running...");
+        ImGui::Begin("DebugGlass");
+        ImGui::TextUnformatted("DebugGlass overlay running...");
         ImGui::End();
 
         ImGui::Render();

@@ -5,27 +5,27 @@
 #include <string>
 #include <thread>
 
-struct MonitorOptions {
+struct DebugGlassOptions {
     int width = 640;
     int height = 480;
-    std::string title = "ImGui Monitor";
+    std::string title = "DebugGlass";
     std::chrono::milliseconds frame_time{16};
 };
 
-class ImGuiMonitor {
+class DebugGlass {
 public:
-    ImGuiMonitor() = default;
-    ~ImGuiMonitor();
+    DebugGlass() = default;
+    ~DebugGlass();
 
-    ImGuiMonitor(const ImGuiMonitor&) = delete;
-    ImGuiMonitor& operator=(const ImGuiMonitor&) = delete;
+    DebugGlass(const DebugGlass&) = delete;
+    DebugGlass& operator=(const DebugGlass&) = delete;
 
-    bool Run(const MonitorOptions& options = MonitorOptions{});
+    bool Run(const DebugGlassOptions& options = DebugGlassOptions{});
     void Stop();
     bool IsRunning() const;
 
 private:
-    void ThreadMain(MonitorOptions options);
+    void ThreadMain(DebugGlassOptions options);
 
     std::thread worker_;
     std::atomic<bool> running_{false};

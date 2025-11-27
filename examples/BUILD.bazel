@@ -4,10 +4,10 @@ config_setting(
 )
 
 cc_binary(
-    name = "hello_imgui",
-    srcs = ["hello_imgui/main.cpp"],
+    name = "hello_debugglass",
+    srcs = ["hello_debugglass/main.cpp"],
     deps = [
-        "//:imgui_monitor",
+        "//:debugglass",
     ],
     linkopts = select({
         ":linux": ["/usr/lib/x86_64-linux-gnu/libGL.so.1"],

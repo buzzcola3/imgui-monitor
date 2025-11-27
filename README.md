@@ -1,6 +1,6 @@
-# imgui-monitor
+# DebugGlass
 
-Cross-platform playground for Bazel + Zig hermetic toolchains with GLFW windowing. The project is split into simple Bazel targets that prove we can build native binaries (Linux/macOS/Windows) without touching the host toolchain.
+DebugGlass is a drop-in Dear ImGui overlay that boots in its own thread so you can instrument any native app quickly. The repository also doubles as a cross-platform Bazel + Zig toolchain playground, demonstrating hermetic builds for Linux/macOS/Windows without relying on host compilers.
 
 ## Prerequisites
 - Bazel 8+ with Bzlmod enabled (default)
@@ -9,13 +9,10 @@ Cross-platform playground for Bazel + Zig hermetic toolchains with GLFW windowin
 
 ## Getting Started
 ```bash
-# Build the console hello world target
-bazel build //test:hello
-
-# Build and run the GLFW smoke test on the local platform
-bazel run //test:window
+# Run the DebugGlass demo locally (opens a window for ~10 seconds)
+bazel run //examples:hello_debugglass
 ```
-The window target opens a 640x480 GLFW surface for a couple of seconds, swaps buffers, then exits.
+The example spins up the DebugGlass overlay, prints "Hello World" to stdout, and exits after a short delay. Use it as a template for wiring the library into your own project.
 
 ## Cross-compiling with Zig
 We register all Zig toolchains from `hermetic_cc_toolchain`, so you can target any supported platform:
@@ -28,6 +25,7 @@ MinGW import libraries (user32, gdi32, shell32, opengl32) come from the bundled 
 ## Project Layout
 - `MODULE.bazel` – Bzlmod dependencies (hermetic Zig toolchain, GLFW, llvm-mingw SDK)
 - `third_party/` – wrappers for GLFW and platform SDK bits
-- `test/` – demo applications (`hello.cpp`, `window.cpp`)
+- `debugglass/` – library sources (`debugglass.h/.cpp`)
+- `examples/` – runnable samples (currently `hello_debugglass`)
 
-As more milestones land (imgui, monitoring widgets, etc.), extend the Bazel packages alongside the existing hermetic toolchain configuration.
+Add more DebugGlass-powered examples under `examples/` as new milestones land (custom widgets, telemetry panels, etc.).
