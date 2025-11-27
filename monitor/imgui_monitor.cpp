@@ -1,0 +1,159 @@
+#include "monitor/imgui_monitor.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
+#include <imgui.h>
+
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+namespace {
+constexpr char kGlslVersion[] = "#version 330";
+}
+
+ImGuiMonitor::~ImGuiMonitor() {
+    Stop();
+}
+
+bool ImGuiMonitor::Run(const MonitorOptions& options) {
+    if (running_.exchange(true)) {
+        return false;
+    }
+
+    stop_requested_.store(false);
+
+    worker_ = std::thread(&ImGuiMonitor::ThreadMain, this, options);
+    return true;
+}
+
+void ImGuiMonitor::Stop() {
+    stop_requested_.store(true);
+    if (worker_.joinable()) {
+        worker_.join();
+        worker_ = std::thread();
+    }
+    running_.store(false);
+}
+
+bool ImGuiMonitor::IsRunning() const {
+    return running_.load();
+}
+
+void ImGuiMonitor::ThreadMain(MonitorOptions options) {
+    GLFWwindow* window = nullptr;
+    bool glfw_initialized = false;
+    bool imgui_created = false;
+    bool imgui_glfw_backend = false;
+    bool imgui_opengl_backend = false;
+
+    if (!glfwInit()) {
+        std::cerr << "Failed to initialize GLFW" << std::endl;
+        running_.store(false);
+        return;
+    }
+    glfw_initialized = true;
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+
+#if defined(__APPLE__)
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+#endif
+
+    window = glfwCreateWindow(options.width, options.height, options.title.c_str(), nullptr, nullptr);
+    if (!window) {
+        std::cerr << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        running_.store(false);
+        return;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+        std::cerr << "Failed to load OpenGL functions via GLAD" << std::endl;
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        running_.store(false);
+        return;
+    }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    imgui_created = true;
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::StyleColorsDark();
+
+    if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) {
+        std::cerr << "Failed to initialize ImGui GLFW backend" << std::endl;
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        running_.store(false);
+        return;
+    }
+    imgui_glfw_backend = true;
+
+    if (!ImGui_ImplOpenGL3_Init(kGlslVersion)) {
+        std::cerr << "Failed to initialize ImGui OpenGL backend" << std::endl;
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        running_.store(false);
+        return;
+    }
+    imgui_opengl_backend = true;
+
+    glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
+
+    while (!glfwWindowShouldClose(window) && !stop_requested_.load()) {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("ImGui Monitor");
+        ImGui::TextUnformatted("ImGui monitor running...");
+        ImGui::End();
+
+        ImGui::Render();
+        int display_w = 0;
+        int display_h = 0;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
+        std::this_thread::sleep_for(options.frame_time);
+    }
+
+    if (imgui_opengl_backend) {
+        ImGui_ImplOpenGL3_Shutdown();
+    }
+    if (imgui_glfw_backend) {
+        ImGui_ImplGlfw_Shutdown();
+    }
+    if (imgui_created) {
+        ImGui::DestroyContext();
+    }
+    if (window) {
+        glfwDestroyWindow(window);
+    }
+    if (glfw_initialized) {
+        glfwTerminate();
+    }
+
+    running_.store(false);
+}

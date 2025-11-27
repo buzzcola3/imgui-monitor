@@ -1,1 +1,11 @@
-# Root build file intentionally left without targets.
+cc_library(
+	name = "imgui_monitor",
+	srcs = ["monitor/imgui_monitor.cpp"],
+	hdrs = ["monitor/imgui_monitor.h"],
+	deps = [
+		"//third_party:glad",
+		"//third_party:glfw",
+		"//third_party:imgui",
+	],
+	visibility = ["//visibility:public"],
+)
