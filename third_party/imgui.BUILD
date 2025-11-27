@@ -41,8 +41,8 @@ cc_library(
     ],
     deps = [
         ":imgui_core",
-        "@//third_party:glad",
-        "@//third_party:glfw",
+        "@debugglass//third_party:glad",
+        "@debugglass//third_party:glfw",
     ],
     includes = [
         ".",
