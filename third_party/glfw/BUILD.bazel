@@ -1,0 +1,45 @@
+package(default_visibility = ["//visibility:public"])
+
+config_setting(
+    name = "linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
+config_setting(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "glfw",
+    deps = ["@glfw//:glfw"] + select({
+        ":windows": ["//third_party/windows_sdk:system_libs"],
+        "//conditions:default": [],
+    }),
+    defines = ["GLFW_INCLUDE_NONE"] + select({
+        ":linux": ["_GLFW_X11"],
+        ":macos": ["_GLFW_COCOA"],
+        ":windows": ["_GLFW_WIN32"],
+        "//conditions:default": [],
+    }),
+    linkopts = select({
+        ":linux": [
+            "-ldl",
+            "-lpthread",
+        ],
+        ":macos": [
+            "-framework Cocoa",
+            "-framework IOKit",
+            "-framework CoreVideo",
+            "-framework OpenGL",
+        ],
+        ":windows": [],
+        "//conditions:default": [],
+    }),
+    linkstatic = True,
+)

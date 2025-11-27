@@ -1,0 +1,7 @@
+bazel-*
+/bazel-bin
+/bazel-testlogs
+/bazel-out
+/.bazelrc.user
+/zig-cache
+/zig-out

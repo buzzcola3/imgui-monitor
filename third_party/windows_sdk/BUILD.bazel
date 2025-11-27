@@ -1,0 +1,33 @@
+load("@rules_cc//cc:defs.bzl", "cc_import")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_import(
+    name = "gdi32",
+    static_library = "@llvm_mingw_sdk//:x86_64-w64-mingw32/lib/libgdi32.a",
+)
+
+cc_import(
+    name = "opengl32",
+    static_library = "@llvm_mingw_sdk//:x86_64-w64-mingw32/lib/libopengl32.a",
+)
+
+cc_import(
+    name = "shell32",
+    static_library = "@llvm_mingw_sdk//:x86_64-w64-mingw32/lib/libshell32.a",
+)
+
+cc_import(
+    name = "user32",
+    static_library = "@llvm_mingw_sdk//:x86_64-w64-mingw32/lib/libuser32.a",
+)
+
+cc_library(
+    name = "system_libs",
+    deps = [
+        ":gdi32",
+        ":opengl32",
+        ":shell32",
+        ":user32",
+    ],
+)

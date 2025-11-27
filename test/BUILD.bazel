@@ -1,0 +1,12 @@
+cc_binary(
+    name = "hello",
+    srcs = ["hello.cpp"],
+)
+
+cc_binary(
+    name = "window",
+    srcs = ["window.cpp"],
+    deps = [
+        "//third_party:glfw",
+    ],
+)
