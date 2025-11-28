@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "debugglass/widgets/graph.h"
+#include "debugglass/widgets/message_monitor.h"
 #include "debugglass/widgets/structure.h"
 #include "debugglass/widgets/variable.h"
 #include "debugglass/widgets/window_content.h"
@@ -26,6 +27,9 @@ public:
     Graph& AddGraph(std::string label);
     Variable& AddVariable(std::string label);
     Structure& AddStructure(std::string label);
+    MessageMonitor& AddMessageMonitor(std::string label);
+    MessageMonitor* FindMessageMonitor(const std::string& label);
+    const MessageMonitor* FindMessageMonitor(const std::string& label) const;
 
     void Render() const;
 

@@ -14,6 +14,9 @@ bazel run //examples:hello_debugglass
 
 # Launch the richer subwindow/telemetry demo
 bazel run //examples:subwindow_demo
+
+# Preview the standalone message monitor widget
+bazel run //examples:message_monitor_demo
 ```
 The example spins up the DebugGlass overlay, prints "Hello World" to stdout, and exits after a short delay. Use it as a template for wiring the library into your own project.
 
@@ -29,7 +32,7 @@ MinGW import libraries (user32, gdi32, shell32, opengl32) come from the bundled 
 - `MODULE.bazel` – Bzlmod dependencies (hermetic Zig toolchain, GLFW, llvm-mingw SDK)
 - `third_party/` – wrappers for GLFW and platform SDK bits
 - `debugglass/` – library sources (`debugglass.h/.cpp`)
-- `examples/` – runnable samples (currently `hello_debugglass`)
+- `examples/` – runnable samples (`hello_debugglass`, `subwindow_demo`, `message_monitor_demo`)
 
 Add more DebugGlass-powered examples under `examples/` as new milestones land (custom widgets, telemetry panels, etc.).
 

@@ -38,6 +38,35 @@ Structure& Tab::AddStructure(std::string label) {
     return *structure;
 }
 
+MessageMonitor& Tab::AddMessageMonitor(std::string label) {
+    auto monitor = std::make_shared<MessageMonitor>(std::move(label));
+    std::lock_guard<std::mutex> lock(content_mutex_);
+    widgets_.push_back(monitor);
+    return *monitor;
+}
+
+MessageMonitor* Tab::FindMessageMonitor(const std::string& label) {
+    std::lock_guard<std::mutex> lock(content_mutex_);
+    for (const auto& widget : widgets_) {
+        auto monitor = std::dynamic_pointer_cast<MessageMonitor>(widget);
+        if (monitor && monitor->label() == label) {
+            return monitor.get();
+        }
+    }
+    return nullptr;
+}
+
+const MessageMonitor* Tab::FindMessageMonitor(const std::string& label) const {
+    std::lock_guard<std::mutex> lock(content_mutex_);
+    for (const auto& widget : widgets_) {
+        auto monitor = std::dynamic_pointer_cast<MessageMonitor>(widget);
+        if (monitor && monitor->label() == label) {
+            return monitor.get();
+        }
+    }
+    return nullptr;
+}
+
 void Tab::Render() const {
     Tab::RenderCallback callback_copy;
     std::vector<std::shared_ptr<WindowContent>> widgets_snapshot;

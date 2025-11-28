@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <string>
 #include <thread>
 
 #include <imgui.h>
@@ -40,6 +41,13 @@ int main() {
     auto& latest_event = logs_structure.AddVariable("Latest Event");
     latest_event.SetValue("Initialized renderer");
 
+    auto& messages_window = monitor.windows.add("Messages");
+    auto& messages_tab = messages_window.tabs.add("bus");
+    messages_tab.SetRenderCallback([]() {
+        ImGui::TextUnformatted("Live message stream (ID/value)");
+    });
+    auto& message_monitor = messages_tab.AddMessageMonitor("Telemetry Bus");
+
     debugglass::DebugGlassOptions options;
     options.title = "DebugGlass Subwindow Demo";
 
@@ -65,6 +73,11 @@ int main() {
         } else {
             latest_event.SetValue("Awaiting user commands...");
         }
+
+        const int message_index = static_cast<int>(phase) % 3;
+        const float message_value = 42.0f + std::sin(phase + message_index);
+        message_monitor.UpsertMessage("ID_" + std::to_string(message_index), message_value);
+
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
 
