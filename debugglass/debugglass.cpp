@@ -99,6 +99,7 @@ void DebugGlass::ThreadMain(DebugGlassOptions options) {
     imgui_created = true;
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
 
     if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) {
@@ -128,6 +129,7 @@ void DebugGlass::ThreadMain(DebugGlassOptions options) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
         const auto windows_snapshot = windows.Snapshot();
         if (windows_snapshot.empty()) {
